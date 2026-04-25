@@ -6,19 +6,25 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "copy:wasm": "node -e \"const {cpSync,mkdirSync}=require('fs');const o='node_modules/.pnpm/onnxruntime-web@1.26.0-dev.20260416-b7804b056c/node_modules/onnxruntime-web/dist';const h='node_modules/.pnpm/@huggingface+transformers@4.2.0/node_modules/@huggingface/transformers/dist';mkdirSync('extension/wasm',{recursive:true});['ort-wasm-simd-threaded.asyncify.mjs','ort-wasm-simd-threaded.asyncify.wasm','ort-wasm-simd-threaded.mjs','ort-wasm-simd-threaded.wasm'].forEach(f=>cpSync(o+'/'+f,'extension/wasm/'+f));cpSync(h+'/ort-wasm-simd-threaded.jsep.mjs','extension/wasm/ort-wasm-simd-threaded.jsep.mjs');\"",
+    "build:extension": "pnpm copy:wasm && esbuild extension/src/popup.ts --bundle --outfile=extension/popup.js --format=esm --platform=browser --target=chrome120 --minify && sed -i 's|`https://cdn\\.jsdelivr\\.net/npm/onnxruntime-web@\\${[^}]*}/dist/`|`./wasm/`|g' extension/popup.js"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.2.0",
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.104.1",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/chrome": "^0.0.320",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "esbuild": "^0.25.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "shadcn": "^4.4.0",
