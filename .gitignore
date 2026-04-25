@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# ML model binaries — distribute via release artifacts or Git LFS
+/models/**/*.onnx
+/models/**/tokenizer.json
+/public/models/
+
+# Claude Code agent skills — regenerable from skills-lock.json
+/.agents/skills/
