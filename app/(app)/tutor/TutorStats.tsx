@@ -1,6 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+} from "recharts";
 import { createClient } from "@/lib/supabase/client";
 import type { Signal } from "@/lib/database.types";
 import {
@@ -13,7 +21,7 @@ import {
   RISK_STYLE,
 } from "@/lib/aggregation";
 
-const DAYS = 14;
+const DAYS = 90;
 
 interface Props {
   pactId: string;
@@ -23,30 +31,49 @@ interface Props {
 export default function TutorStats({ pactId, initialSignals }: Props) {
   const [signals, setSignals] = useState<Signal[]>(initialSignals);
   const [newIds, setNewIds] = useState<Set<string>>(new Set());
+  const [live, setLive] = useState(false);
   const supabase = useRef(createClient());
 
   useEffect(() => {
-    const channel = supabase.current
-      .channel(`tutor-stats-${pactId}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "signals", filter: `pact_id=eq.${pactId}` },
-        (payload) => {
-          const s = payload.new as Signal;
-          setSignals((prev) => [s, ...prev]);
-          setNewIds((prev) => new Set(prev).add(s.id));
-          setTimeout(() => {
-            setNewIds((prev) => {
-              const next = new Set(prev);
-              next.delete(s.id);
-              return next;
-            });
-          }, 2500);
-        }
-      )
-      .subscribe();
+    let active = true;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let channel: any = null;
 
-    return () => { supabase.current.removeChannel(channel); };
+    async function subscribe() {
+      // Esperar a que el JWT esté disponible antes de conectar realtime
+      const { data: { session } } = await supabase.current.auth.getSession();
+      if (!active || !session) return;
+
+      channel = supabase.current
+        .channel(`tutor-stats-${pactId}`)
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "signals", filter: `pact_id=eq.${pactId}` },
+          (payload) => {
+            const s = payload.new as Signal;
+            setSignals((prev) => [s, ...prev]);
+            setNewIds((prev) => new Set(prev).add(s.id));
+            setTimeout(() => {
+              setNewIds((prev) => {
+                const next = new Set(prev);
+                next.delete(s.id);
+                return next;
+              });
+            }, 2500);
+          }
+        )
+        .subscribe((status: string) => {
+          if (active) setLive(status === "SUBSCRIBED");
+        });
+    }
+
+    subscribe();
+
+    return () => {
+      active = false;
+      setLive(false);
+      if (channel) supabase.current.removeChannel(channel);
+    };
   }, [pactId]);
 
   const overallRisk = aggregateRisk(signals);
@@ -109,13 +136,20 @@ export default function TutorStats({ pactId, initialSignals }: Props) {
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
             Señales recientes
           </h2>
-          <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+          {live ? (
+            <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              En vivo
             </span>
-            En vivo
-          </span>
+          ) : (
+            <span className="flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500">
+              <span className="h-2 w-2 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+              Conectando…
+            </span>
+          )}
         </div>
         {signals.length === 0 ? (
           <p className="text-sm text-zinc-500">Sin señales aún.</p>
@@ -234,12 +268,9 @@ export default function TutorStats({ pactId, initialSignals }: Props) {
         </section>
       </div>
 
-      {/* Sparkline */}
+      {/* Señales por día — área chart interactivo */}
       <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-        <h2 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-          Señales por día (últimos {DAYS} días)
-        </h2>
-        <Sparkline data={byDay} />
+        <SignalDayChart data={byDay} />
       </section>
     </>
   );
@@ -262,21 +293,87 @@ function Stat({ label, value, alert }: { label: string; value: number; alert?: b
   );
 }
 
-function Sparkline({ data }: { data: Array<{ day: string; count: number }> }) {
-  const max = Math.max(...data.map((d) => d.count), 1);
+const RANGE_OPTIONS = [
+  { label: "Últimos 7 días", value: 7 },
+  { label: "Últimas 2 semanas", value: 14 },
+  { label: "Último mes", value: 30 },
+  { label: "Últimos 3 meses", value: 90 },
+];
+
+function SignalDayChart({ data }: { data: Array<{ day: string; count: number }> }) {
+  const [range, setRange] = useState(14);
+  const filtered = data.slice(-range);
+
   return (
-    <div className="flex h-16 items-end gap-0.5">
-      {data.map((d) => (
-        <div key={d.day} className="group relative flex-1">
-          <div
-            className="w-full rounded-sm bg-zinc-300 transition-all duration-500 group-hover:bg-zinc-500 dark:bg-zinc-700 dark:group-hover:bg-zinc-400"
-            style={{ height: `${Math.max((d.count / max) * 100, d.count > 0 ? 8 : 0)}%` }}
-          />
-          <div className="pointer-events-none absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-zinc-900 px-1.5 py-0.5 text-xs text-white opacity-0 group-hover:opacity-100 dark:bg-zinc-100 dark:text-zinc-900">
-            {d.count > 0 ? `${d.count} señal${d.count > 1 ? "es" : ""}` : "–"}
-          </div>
+    <>
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <div>
+          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+            Señales por día
+          </p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Total de señales detectadas por día
+          </p>
         </div>
-      ))}
-    </div>
+        <select
+          value={range}
+          onChange={(e) => setRange(Number(e.target.value))}
+          className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+        >
+          {RANGE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <ResponsiveContainer width="100%" height={250}>
+        <AreaChart data={filtered} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
+          <defs>
+            <linearGradient id="fillSignals" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
+              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.05} />
+            </linearGradient>
+          </defs>
+          <CartesianGrid vertical={false} stroke="rgba(113,113,122,0.15)" />
+          <XAxis
+            dataKey="day"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            minTickGap={32}
+            tick={{ fontSize: 11, fill: "#71717a" }}
+            tickFormatter={(v) =>
+              new Date(v).toLocaleDateString("es-MX", { month: "short", day: "numeric" })
+            }
+          />
+          <Tooltip
+            cursor={{ stroke: "#8b5cf6", strokeWidth: 1, strokeDasharray: "4 2" }}
+            content={({ active, payload, label }) => {
+              if (!active || !payload?.length) return null;
+              const count = payload[0].value as number;
+              return (
+                <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+                  <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                    {label ? new Date(label).toLocaleDateString("es-MX", { month: "long", day: "numeric" }) : ""}
+                  </p>
+                  <p className="mt-0.5 text-sm font-bold text-violet-600 dark:text-violet-400">
+                    {count} señal{count !== 1 ? "es" : ""}
+                  </p>
+                </div>
+              );
+            }}
+          />
+          <Area
+            dataKey="count"
+            type="natural"
+            fill="url(#fillSignals)"
+            stroke="#8b5cf6"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 4, fill: "#8b5cf6", strokeWidth: 0 }}
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </>
   );
 }
