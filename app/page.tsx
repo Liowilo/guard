@@ -8,23 +8,31 @@ export default async function Home() {
   if (data.user) redirect("/dashboard");
 
   return (
-    <main className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
-      <nav className="border-b border-zinc-200 dark:border-zinc-800">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <span className="text-lg font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Guard <span className="text-zinc-400">·</span>{" "}
-            <span className="font-normal text-zinc-500">Pacto Digital</span>
-          </span>
-          <div className="flex items-center gap-3 text-sm">
+    <main className="flex min-h-screen flex-col bg-zinc-950 text-zinc-50">
+      {/* Nav */}
+      <nav className="fixed top-0 z-50 w-full border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3.5">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold tracking-tight">Guard</span>
+            <span className="text-zinc-700">·</span>
+            <span className="text-sm font-normal text-zinc-500">Pacto Digital</span>
+          </div>
+          <div className="flex items-center gap-1 text-sm">
             <Link
               href="/demo"
-              className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              className="rounded-md px-3 py-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
             >
-              Demo del clasificador
+              Demo
+            </Link>
+            <Link
+              href="/register"
+              className="rounded-md px-3 py-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
+            >
+              Registrarse
             </Link>
             <Link
               href="/login"
-              className="rounded-md bg-zinc-900 px-3 py-1.5 font-medium text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
+              className="ml-1 rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-zinc-900 hover:bg-zinc-200 transition-colors"
             >
               Iniciar sesión
             </Link>
@@ -32,35 +40,294 @@ export default async function Home() {
         </div>
       </nav>
 
-      <section className="flex-1">
-        <div className="mx-auto max-w-3xl px-6 py-20">
-          <h1 className="text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
-            Una capa de protección digital que trata al menor como aliado, no
-            como sospechoso.
+      {/* Hero */}
+      <section className="relative flex-1 overflow-hidden pt-16">
+        {/* Grid background */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgba(63,63,70,0.65) 1px, transparent 1px), linear-gradient(to bottom, rgba(63,63,70,0.65) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+            maskImage:
+              "linear-gradient(to bottom, transparent 0%, #000 8%, #000 82%, transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent 0%, #000 8%, #000 82%, transparent 100%)",
+            animation: "gridBreathe 5s ease-in-out infinite",
+          }}
+        />
+        {/* Animated background */}
+        <style>{`
+          @keyframes orbDrift1 {
+            0%, 100% { transform: translateX(-50%) translateY(0px) scale(1); }
+            33%       { transform: translateX(-53%) translateY(-40px) scale(1.08); }
+            66%       { transform: translateX(-47%) translateY(22px) scale(0.96); }
+          }
+          @keyframes orbDrift2 {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50%       { transform: translateY(-28px) scale(1.12); }
+          }
+          @keyframes orbDrift3 {
+            0%, 100% { transform: translateY(0px) translateX(0px); }
+            40%       { transform: translateY(30px) translateX(-18px); }
+            70%       { transform: translateY(-12px) translateX(14px); }
+          }
+          @keyframes gridBreathe {
+            0%, 100% { opacity: 0.3; }
+            50%       { opacity: 0.85; }
+          }
+          @keyframes particleFloat {
+            0%   { transform: translateY(0px);    opacity: 0; }
+            8%   { opacity: 0.65; }
+            88%  { opacity: 0.4; }
+            100% { transform: translateY(-340px); opacity: 0; }
+          }
+        `}</style>
+        <div className="pointer-events-none absolute inset-0">
+          {/* Orb principal centro */}
+          <div
+            className="absolute -top-15 left-1/2 w-175 h-112.5 rounded-full"
+            style={{
+              background: "radial-gradient(ellipse, rgba(52,211,153,0.13) 0%, transparent 70%)",
+              animation: "orbDrift1 15s ease-in-out infinite",
+            }}
+          />
+          {/* Orb secundario derecha */}
+          <div
+            className="absolute -top-22.5 -right-20 w-120 h-80 rounded-full"
+            style={{
+              background: "radial-gradient(ellipse, rgba(20,184,166,0.09) 0%, transparent 70%)",
+              animation: "orbDrift2 20s ease-in-out infinite",
+            }}
+          />
+          {/* Orb secundario izquierda */}
+          <div
+            className="absolute top-20 -left-15 w-105 h-70 rounded-full"
+            style={{
+              background: "radial-gradient(ellipse, rgba(74,222,128,0.07) 0%, transparent 70%)",
+              animation: "orbDrift3 25s ease-in-out infinite",
+            }}
+          />
+          {/* Partículas flotantes */}
+          {[
+            { left: 10, delay: 0,   dur: 9    },
+            { left: 18, delay: 2.1, dur: 11   },
+            { left: 26, delay: 0.8, dur: 8.5  },
+            { left: 34, delay: 3.5, dur: 10   },
+            { left: 42, delay: 1.4, dur: 12   },
+            { left: 50, delay: 4.2, dur: 9.5  },
+            { left: 58, delay: 0.5, dur: 11.5 },
+            { left: 66, delay: 2.8, dur: 8    },
+            { left: 74, delay: 1.9, dur: 10.5 },
+            { left: 82, delay: 3.1, dur: 13   },
+            { left: 90, delay: 0.3, dur: 9    },
+            { left: 22, delay: 5.0, dur: 10   },
+          ].map((p, i) => (
+            <div
+              key={i}
+              className="absolute bottom-20 w-0.5 h-0.5 rounded-full bg-emerald-400/50"
+              style={{ left: `${p.left}%`, animation: `particleFloat ${p.dur}s ${p.delay}s ease-in-out infinite` }}
+            />
+          ))}
+        </div>
+
+        <div className="relative mx-auto max-w-4xl px-6 pt-14 pb-20 sm:pt-16 sm:pb-24 text-center">
+          {/* Badge */}
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-1.5 text-xs text-zinc-400">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            Clasificación on-device · Los mensajes nunca salen del dispositivo
+          </div>
+
+          {/* App name */}
+          <div className="mb-6 leading-none tracking-tighter">
+            <span className="text-6xl font-black text-white sm:text-7xl lg:text-8xl">guard</span><span
+              className="text-6xl font-black sm:text-7xl lg:text-8xl bg-linear-to-br from-emerald-300 via-emerald-400 to-green-500 bg-clip-text text-transparent"
+              style={{ filter: "drop-shadow(0 0 32px rgb(52 211 153 / 0.35))" }}
+            >IA</span>
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            Protección digital que
+            <br />
+            <span className="text-zinc-500">trata al menor como aliado</span>
           </h1>
-          <p className="mt-6 text-lg leading-8 text-zinc-600 dark:text-zinc-300">
-            La detección corre <strong>on-device</strong> — los mensajes nunca
-            salen del dispositivo del menor. Tutor y menor firman un Pacto
-            Digital donde el adolescente ve <em>exactamente</em> qué se
-            monitorea, y el tutor recibe únicamente señales agregadas, nunca
-            conversaciones.
+
+          <p className="mx-auto mt-8 max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg">
+            Detecta patrones de grooming en WhatsApp Web y Discord directamente
+            en el dispositivo. Tutor y menor firman un{" "}
+            <span className="text-zinc-200">Pacto Digital</span> y ven
+            exactamente los mismos datos — ningún mensaje, solo señales.
           </p>
-          <div className="mt-10 grid gap-4 sm:grid-cols-3">
-            <Feature title="On-device" desc="Modelo XLM-R cuantizado, ~50 ms por mensaje. Ningún contenido sale del dispositivo." />
-            <Feature title="Transparencia" desc="El menor ve la misma vista que su tutor. Mismo dato, misma interfaz." />
-            <Feature title="Botón SOS" desc="Contacta a un adulto de confianza distinto al tutor — el riesgo a veces está en casa." />
+
+          {/* CTAs */}
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+            <Link
+              href="/register"
+              className="inline-flex items-center gap-2 rounded-md bg-white px-5 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-100 transition-colors shadow-lg shadow-white/10"
+            >
+              Crear cuenta gratuita
+              <span aria-hidden>→</span>
+            </Link>
+            <Link
+              href="/demo"
+              className="inline-flex items-center gap-2 rounded-md border border-zinc-700 px-5 py-2.5 text-sm font-semibold text-zinc-300 hover:border-zinc-500 hover:text-zinc-100 hover:bg-zinc-900 transition-colors"
+            >
+              Ver demo del clasificador
+            </Link>
           </div>
         </div>
       </section>
+
+      {/* Features */}
+      <section className="relative mx-auto max-w-5xl px-6 pb-16">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <FeatureCard
+            icon={<IconOnDevice />}
+            title="On-device"
+            desc="Modelo XLM-R cuantizado a ~113 MB. Inferencia en ~50 ms sin conexión. Ningún contenido sale del dispositivo del menor."
+          />
+          <FeatureCard
+            icon={<IconTransparency />}
+            title="Transparencia total"
+            desc="El menor ve exactamente la misma vista que su tutor — mismo dato, misma interfaz. Sin vigilancia encubierta."
+          />
+          <FeatureCard
+            icon={<IconSos />}
+            title="Botón SOS privado"
+            desc='Contacta a un adulto de confianza distinto al tutor. El tutor nunca accede a este canal — porque el riesgo a veces está en casa.'
+          />
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="border-t border-zinc-800/60 bg-zinc-900/30 py-20">
+        <div className="mx-auto max-w-5xl px-6">
+          <p className="text-center text-xs font-semibold uppercase tracking-widest text-zinc-500">
+            Cómo funciona
+          </p>
+          <div className="mt-10 grid gap-px sm:grid-cols-4 rounded-xl overflow-hidden border border-zinc-800">
+            <Step
+              number="01"
+              title="Pacto firmado"
+              desc="Tutor y menor acuerdan qué categorías se monitoran y quién es el adulto de confianza."
+            />
+            <Step
+              number="02"
+              title="Extensión activa"
+              desc="La extensión Chrome analiza mensajes localmente en WhatsApp Web y Discord."
+            />
+            <Step
+              number="03"
+              title="Solo señales"
+              desc="Únicamente el timestamp, plataforma y etiqueta detectada llegan al dashboard."
+            />
+            <Step
+              number="04"
+              title="Vista compartida"
+              desc="Tutor y menor ven los mismos datos. Si hay riesgo, el menor puede activar el SOS."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Privacy callout */}
+      <section className="mx-auto max-w-5xl px-6 py-16">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-8 sm:p-10">
+          <div className="grid gap-8 sm:grid-cols-3">
+            <PrivacyStat label="Contenido subido al servidor" value="0 bytes" />
+            <PrivacyStat label="Modelos de 5 patrones de grooming" value="XLM-R" />
+            <PrivacyStat label="Acceso del tutor al canal SOS" value="Ninguno" />
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-zinc-800/60 py-8">
+        <div className="mx-auto max-w-5xl px-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs text-zinc-600">
+          <span>Guard · Pacto Digital</span>
+          <span className="italic">El menor es aliado, no sospechoso.</span>
+        </div>
+      </footer>
     </main>
   );
 }
 
-function Feature({ title, desc }: { title: string; desc: string }) {
+function FeatureCard({
+  icon,
+  title,
+  desc,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}) {
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{title}</div>
-      <div className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{desc}</div>
+    <div className="group rounded-xl border border-zinc-800 bg-zinc-900/50 p-6 hover:border-zinc-700 hover:bg-zinc-900 transition-colors">
+      <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-300 group-hover:border-zinc-600 transition-colors">
+        {icon}
+      </div>
+      <div className="text-sm font-semibold text-zinc-100">{title}</div>
+      <div className="mt-2 text-sm leading-6 text-zinc-500">{desc}</div>
     </div>
+  );
+}
+
+function Step({
+  number,
+  title,
+  desc,
+}: {
+  number: string;
+  title: string;
+  desc: string;
+}) {
+  return (
+    <div className="bg-zinc-900/60 p-6">
+      <div className="text-xs font-mono text-zinc-600 mb-3">{number}</div>
+      <div className="text-sm font-semibold text-zinc-100 mb-2">{title}</div>
+      <div className="text-sm leading-6 text-zinc-500">{desc}</div>
+    </div>
+  );
+}
+
+function PrivacyStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="text-center sm:text-left">
+      <div className="text-2xl font-bold tracking-tight text-zinc-100">
+        {value}
+      </div>
+      <div className="mt-1 text-xs text-zinc-500">{label}</div>
+    </div>
+  );
+}
+
+function IconOnDevice() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <rect x="2" y="3" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M5 12v1M11 12v1M4 13h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M6 7.5l1.5 1.5L10 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function IconTransparency() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.2" />
+      <path d="M8 2.5v11M2.5 8h11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <path d="M4.5 4.5c1 1.5 1.5 2.5 3.5 3.5-2 1-2.5 2-3.5 3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconSos() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M8 2L8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="8" cy="11" r="1" fill="currentColor" />
+      <path d="M2.5 13.5L5 3.5C5.8 1.2 10.2 1.2 11 3.5l2.5 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
   );
 }

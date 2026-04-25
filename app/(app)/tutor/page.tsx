@@ -42,13 +42,15 @@ export default async function TutorPage() {
     const adultos = (familyMembers ?? []).filter((p) => p.role === "adulto_confianza");
 
     return (
-      <main className="mx-auto max-w-3xl px-6 py-12 space-y-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Hola, {profile.display_name}
-        </h1>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          Para comenzar, invita a tu familia y crea el Pacto Digital.
-        </p>
+      <main className="mx-auto max-w-3xl px-6 py-10 space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">
+            Hola, {profile.display_name}
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            Para comenzar, invita a tu familia y crea el Pacto Digital.
+          </p>
+        </div>
         <PactCreate menores={menores} adultos={adultos} familyId={profile.family_id} />
       </main>
     );
@@ -62,12 +64,14 @@ export default async function TutorPage() {
       .single();
 
     return (
-      <main className="mx-auto max-w-3xl px-6 py-12 space-y-4">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+      <main className="mx-auto max-w-3xl px-6 py-10">
+        <h1 className="mb-6 text-2xl font-semibold tracking-tight text-zinc-50">
           Hola, {profile.display_name}
         </h1>
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200">
-          Pacto enviado a <strong>{menorProfile?.display_name ?? "el menor"}</strong>. Esperando su firma para activar el monitoreo.
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-5 text-sm text-amber-400">
+          Pacto enviado a{" "}
+          <strong className="text-amber-300">{menorProfile?.display_name ?? "el menor"}</strong>.
+          Esperando su firma para activar el monitoreo.
         </div>
       </main>
     );
@@ -92,14 +96,23 @@ export default async function TutorPage() {
   const initialSignals: Signal[] = signals ?? [];
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-10 space-y-8">
-      <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Dashboard · {menorProfile?.display_name ?? "Menor"}
-        </h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Señales de los últimos {DAYS} días. Sin contenido de mensajes.
-        </p>
+    <main className="mx-auto max-w-5xl px-6 py-10 space-y-6">
+      <header className="flex items-start justify-between gap-4">
+        <div>
+          <p className="mb-1 text-xs font-medium uppercase tracking-widest text-zinc-600">
+            Dashboard · tutor
+          </p>
+          <h1 className="text-2xl font-semibold tracking-tight text-zinc-50">
+            {menorProfile?.display_name ?? "Menor"}
+          </h1>
+          <p className="mt-1 text-sm text-zinc-500">
+            Señales de los últimos {DAYS} días · sin contenido de mensajes
+          </p>
+        </div>
+        <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/80 px-3 py-1.5 text-xs text-zinc-500 shrink-0">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          Monitoreo activo
+        </div>
       </header>
 
       <TutorStats pactId={pact.id} initialSignals={initialSignals} />

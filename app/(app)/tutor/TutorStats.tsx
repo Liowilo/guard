@@ -28,6 +28,18 @@ interface Props {
   initialSignals: Signal[];
 }
 
+const RISK_BADGE = {
+  alto:  "border border-red-500/30  bg-red-500/10  text-red-400",
+  medio: "border border-amber-500/30 bg-amber-500/10 text-amber-400",
+  bajo:  "border border-emerald-500/30 bg-emerald-500/10 text-emerald-400",
+} as const;
+
+const RISK_DOT = {
+  alto:  "bg-red-500",
+  medio: "bg-amber-400",
+  bajo:  "bg-emerald-400",
+} as const;
+
 export default function TutorStats({ pactId, initialSignals }: Props) {
   const [signals, setSignals] = useState<Signal[]>(initialSignals);
   const [newIds, setNewIds] = useState<Set<string>>(new Set());
@@ -40,7 +52,6 @@ export default function TutorStats({ pactId, initialSignals }: Props) {
     let channel: any = null;
 
     async function subscribe() {
-      // Esperar a que el JWT esté disponible antes de conectar realtime
       const { data: { session } } = await supabase.current.auth.getSession();
       if (!active || !session) return;
 
@@ -77,52 +88,53 @@ export default function TutorStats({ pactId, initialSignals }: Props) {
   }, [pactId]);
 
   const overallRisk = aggregateRisk(signals);
-  const byLabel = countByLabel(signals);
+  const byLabel    = countByLabel(signals);
   const byPlatform = countByPlatform(signals);
-  const byDay = countByDay(signals, DAYS);
-  const coFiring = detectCoFiringPatterns(signals);
-  const riskStyle = RISK_STYLE[overallRisk];
-  const highRisk = signals.filter((s) => s.risk_level === "alto");
+  const byDay      = countByDay(signals, DAYS);
+  const coFiring   = detectCoFiringPatterns(signals);
+  const riskStyle  = RISK_STYLE[overallRisk];
+  const highRisk   = signals.filter((s) => s.risk_level === "alto");
 
   const platformLabel = (p: string | null) =>
     p ? p.replace("_web", "").replace("_", " ") : "desconocido";
 
   return (
     <>
-      {/* Risk badge — se actualiza con cada señal */}
-      <div className={`rounded-lg border px-4 py-2 text-center transition-colors ${riskStyle.bg} ${riskStyle.border}`}>
-        <div className={`text-xs font-medium uppercase tracking-wide ${riskStyle.text}`}>
+      {/* Risk badge */}
+      <div className={`rounded-xl border px-5 py-4 text-center transition-colors ${riskStyle.bg} ${riskStyle.border}`}>
+        <p className={`text-xs font-medium uppercase tracking-widest ${riskStyle.text}`}>
           Riesgo global
-        </div>
-        <div className={`text-xl font-bold capitalize ${riskStyle.text}`}>
+        </p>
+        <p className={`mt-1 text-2xl font-bold capitalize ${riskStyle.text}`}>
           {overallRisk}
-        </div>
+        </p>
       </div>
 
-      {/* Summary row */}
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Stat label="Señales totales" value={signals.length} />
-        <Stat label="Alto riesgo" value={highRisk.length} alert={highRisk.length > 0} />
-        <Stat label="Plataformas" value={byPlatform.length} />
-        <Stat label="Co-disparos" value={coFiring.length} alert={coFiring.length > 0} />
+      {/* Summary stats */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <StatCard label="Señales totales"  value={signals.length} />
+        <StatCard label="Alto riesgo"       value={highRisk.length}  alert={highRisk.length > 0} />
+        <StatCard label="Plataformas"       value={byPlatform.length} />
+        <StatCard label="Co-disparos"       value={coFiring.length}  alert={coFiring.length > 0} />
       </div>
 
       {/* Co-firing alert */}
       {coFiring.length > 0 && (
-        <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-900 dark:bg-red-950">
-          <p className="text-sm font-semibold text-red-800 dark:text-red-200">
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-5">
+          <p className="text-sm font-semibold text-red-400">
             Patrones combinados detectados
           </p>
-          <p className="mt-1 text-xs text-red-700 dark:text-red-300">
-            Se detectaron {coFiring.length} instancia(s) donde dos patrones de
-            riesgo se activaron juntos en un intervalo corto — señal más fuerte que
-            un patrón aislado.
+          <p className="mt-1 text-xs text-red-400/70 leading-5">
+            {coFiring.length} instancia{coFiring.length > 1 ? "s" : ""} donde dos patrones
+            se activaron juntos en un intervalo corto — señal más fuerte que un patrón aislado.
           </p>
-          <ul className="mt-2 space-y-1 text-xs text-red-700 dark:text-red-300">
+          <ul className="mt-3 space-y-1.5">
             {coFiring.slice(0, 3).map((cf, i) => (
-              <li key={i}>
+              <li key={i} className="flex items-center gap-2 text-xs text-red-400/80">
+                <span className="h-1 w-1 shrink-0 rounded-full bg-red-500" />
                 {new Date(cf.at).toLocaleDateString("es-MX")} ·{" "}
-                <strong>{LABEL_INFO[cf.pair[0]].name}</strong> +{" "}
+                <strong>{LABEL_INFO[cf.pair[0]].name}</strong>
+                {" "}+{" "}
                 <strong>{LABEL_INFO[cf.pair[1]].name}</strong>
               </li>
             ))}
@@ -131,13 +143,11 @@ export default function TutorStats({ pactId, initialSignals }: Props) {
       )}
 
       {/* Live feed */}
-      <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            Señales recientes
-          </h2>
+          <h2 className="text-sm font-semibold text-zinc-100">Señales recientes</h2>
           {live ? (
-            <span className="flex items-center gap-1.5 text-xs text-emerald-600 dark:text-emerald-400">
+            <span className="flex items-center gap-1.5 text-xs text-emerald-400">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
@@ -145,50 +155,47 @@ export default function TutorStats({ pactId, initialSignals }: Props) {
               En vivo
             </span>
           ) : (
-            <span className="flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500">
-              <span className="h-2 w-2 rounded-full bg-zinc-300 dark:bg-zinc-600" />
+            <span className="flex items-center gap-1.5 text-xs text-zinc-600">
+              <span className="h-2 w-2 rounded-full bg-zinc-700" />
               Conectando…
             </span>
           )}
         </div>
+
         {signals.length === 0 ? (
-          <p className="text-sm text-zinc-500">Sin señales aún.</p>
+          <p className="py-4 text-center text-sm text-zinc-600">Sin señales aún.</p>
         ) : (
-          <ul className="max-h-72 divide-y divide-zinc-100 overflow-y-auto dark:divide-zinc-800">
+          <ul className="max-h-72 divide-y divide-zinc-800/60 overflow-y-auto">
             {signals.slice(0, 30).map((s) => {
               const isNew = newIds.has(s.id);
-              const rStyle = RISK_STYLE[s.risk_level];
-              const dot =
-                s.risk_level === "alto" ? "bg-red-500"
-                : s.risk_level === "medio" ? "bg-amber-400"
-                : "bg-emerald-400";
               return (
                 <li
                   key={s.id}
                   className={`flex items-center justify-between gap-3 py-2.5 text-sm transition-colors duration-1000 ${
-                    isNew ? "bg-violet-50 dark:bg-violet-950/40" : ""
+                    isNew ? "bg-emerald-500/10" : ""
                   }`}
                 >
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span className={`h-2 w-2 shrink-0 rounded-full ${dot}`} />
-                    <div>
-                      <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${RISK_DOT[s.risk_level]}`} />
+                    <div className="min-w-0">
+                      <span className="font-medium text-zinc-100">
                         {LABEL_INFO[s.label].name}
                       </span>
                       {s.platform && (
-                        <span className="ml-2 text-xs capitalize text-zinc-500 dark:text-zinc-400">
+                        <span className="ml-2 text-xs capitalize text-zinc-600">
                           {platformLabel(s.platform)}
                         </span>
                       )}
                     </div>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${rStyle.bg} ${rStyle.text}`}>
+                    <span className={`rounded-md px-1.5 py-0.5 text-xs font-medium ${RISK_BADGE[s.risk_level]}`}>
                       {s.risk_level}
                     </span>
-                    <time className="text-xs text-zinc-400">
+                    <time className="text-xs text-zinc-600">
                       {new Date(s.detected_at).toLocaleTimeString("es-MX", {
-                        hour: "2-digit", minute: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
                       })}
                     </time>
                   </div>
@@ -200,30 +207,24 @@ export default function TutorStats({ pactId, initialSignals }: Props) {
       </section>
 
       {/* By label + by platform */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            Por patrón
-          </h2>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <h2 className="mb-5 text-sm font-semibold text-zinc-100">Por patrón</h2>
           {byLabel.length === 0 ? (
-            <p className="text-sm text-zinc-500">Sin señales en este periodo.</p>
+            <p className="text-sm text-zinc-600">Sin señales en este periodo.</p>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {byLabel.map(({ label, count }) => {
                 const pct = Math.round((count / signals.length) * 100);
                 return (
                   <li key={label}>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-zinc-800 dark:text-zinc-200">
-                        {LABEL_INFO[label].name}
-                      </span>
-                      <span className="tabular-nums text-zinc-500 dark:text-zinc-400">
-                        {count}
-                      </span>
+                    <div className="mb-1.5 flex justify-between text-xs">
+                      <span className="text-zinc-300">{LABEL_INFO[label].name}</span>
+                      <span className="tabular-nums text-zinc-500">{count}</span>
                     </div>
-                    <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+                    <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
                       <div
-                        className="h-full bg-zinc-800 dark:bg-zinc-200 transition-all duration-500"
+                        className="h-full bg-emerald-500 transition-all duration-500"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -234,29 +235,23 @@ export default function TutorStats({ pactId, initialSignals }: Props) {
           )}
         </section>
 
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <h2 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            Por plataforma
-          </h2>
+        <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <h2 className="mb-5 text-sm font-semibold text-zinc-100">Por plataforma</h2>
           {byPlatform.length === 0 ? (
-            <p className="text-sm text-zinc-500">Sin señales en este periodo.</p>
+            <p className="text-sm text-zinc-600">Sin señales en este periodo.</p>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-4">
               {byPlatform.map(({ platform, count }) => {
                 const pct = Math.round((count / signals.length) * 100);
                 return (
                   <li key={platform}>
-                    <div className="flex justify-between text-sm">
-                      <span className="capitalize text-zinc-800 dark:text-zinc-200">
-                        {platformLabel(platform)}
-                      </span>
-                      <span className="tabular-nums text-zinc-500 dark:text-zinc-400">
-                        {count}
-                      </span>
+                    <div className="mb-1.5 flex justify-between text-xs">
+                      <span className="capitalize text-zinc-300">{platformLabel(platform)}</span>
+                      <span className="tabular-nums text-zinc-500">{count}</span>
                     </div>
-                    <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+                    <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-800">
                       <div
-                        className="h-full bg-zinc-500 dark:bg-zinc-400 transition-all duration-500"
+                        className="h-full bg-teal-500 transition-all duration-500"
                         style={{ width: `${pct}%` }}
                       />
                     </div>
@@ -268,36 +263,48 @@ export default function TutorStats({ pactId, initialSignals }: Props) {
         </section>
       </div>
 
-      {/* Señales por día — área chart interactivo */}
-      <section className="rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      {/* Señales por día */}
+      <section className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
         <SignalDayChart data={byDay} />
       </section>
     </>
   );
 }
 
-function Stat({ label, value, alert }: { label: string; value: number; alert?: boolean }) {
+function StatCard({
+  label,
+  value,
+  alert,
+}: {
+  label: string;
+  value: number;
+  alert?: boolean;
+}) {
   return (
-    <div className={`rounded-lg border p-4 transition-colors ${
-      alert
-        ? "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950"
-        : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
-    }`}>
-      <div className="text-xs text-zinc-500 dark:text-zinc-400">{label}</div>
-      <div className={`text-2xl font-bold tabular-nums ${
-        alert ? "text-red-700 dark:text-red-300" : "text-zinc-900 dark:text-zinc-50"
-      }`}>
+    <div
+      className={`rounded-xl border p-4 transition-colors ${
+        alert
+          ? "border-red-500/30 bg-red-500/10"
+          : "border-zinc-800 bg-zinc-900/50"
+      }`}
+    >
+      <p className="text-xs text-zinc-500">{label}</p>
+      <p
+        className={`mt-1.5 text-2xl font-bold tabular-nums tracking-tight ${
+          alert ? "text-red-400" : "text-zinc-50"
+        }`}
+      >
         {value}
-      </div>
+      </p>
     </div>
   );
 }
 
 const RANGE_OPTIONS = [
-  { label: "Últimos 7 días", value: 7 },
-  { label: "Últimas 2 semanas", value: 14 },
-  { label: "Último mes", value: 30 },
-  { label: "Últimos 3 meses", value: 90 },
+  { label: "7 días",   value: 7 },
+  { label: "14 días",  value: 14 },
+  { label: "30 días",  value: 30 },
+  { label: "90 días",  value: 90 },
 ];
 
 function SignalDayChart({ data }: { data: Array<{ day: string; count: number }> }) {
@@ -306,57 +313,64 @@ function SignalDayChart({ data }: { data: Array<{ day: string; count: number }> 
 
   return (
     <>
-      <div className="mb-4 flex items-center justify-between gap-2">
+      <div className="mb-5 flex items-center justify-between gap-2">
         <div>
-          <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            Señales por día
-          </p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Total de señales detectadas por día
-          </p>
+          <p className="text-sm font-semibold text-zinc-100">Señales por día</p>
+          <p className="text-xs text-zinc-500">Total de señales detectadas por día</p>
         </div>
-        <select
-          value={range}
-          onChange={(e) => setRange(Number(e.target.value))}
-          className="rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
-        >
+        <div className="flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-950 p-1">
           {RANGE_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>{o.label}</option>
+            <button
+              key={o.value}
+              onClick={() => setRange(o.value)}
+              className={`rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                range === o.value
+                  ? "bg-zinc-800 text-zinc-100"
+                  : "text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              {o.label}
+            </button>
           ))}
-        </select>
+        </div>
       </div>
 
-      <ResponsiveContainer width="100%" height={250}>
+      <ResponsiveContainer width="100%" height={220}>
         <AreaChart data={filtered} margin={{ top: 4, right: 4, left: -20, bottom: 0 }}>
           <defs>
             <linearGradient id="fillSignals" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
-              <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.05} />
+              <stop offset="5%"  stopColor="#34d399" stopOpacity={0.2} />
+              <stop offset="95%" stopColor="#34d399" stopOpacity={0.02} />
             </linearGradient>
           </defs>
-          <CartesianGrid vertical={false} stroke="rgba(113,113,122,0.15)" />
+          <CartesianGrid vertical={false} stroke="rgba(63,63,70,0.35)" />
           <XAxis
             dataKey="day"
             tickLine={false}
             axisLine={false}
             tickMargin={8}
             minTickGap={32}
-            tick={{ fontSize: 11, fill: "#71717a" }}
+            tick={{ fontSize: 11, fill: "#52525b" }}
             tickFormatter={(v) =>
               new Date(v).toLocaleDateString("es-MX", { month: "short", day: "numeric" })
             }
           />
           <Tooltip
-            cursor={{ stroke: "#8b5cf6", strokeWidth: 1, strokeDasharray: "4 2" }}
+            cursor={{ stroke: "#34d399", strokeWidth: 1, strokeDasharray: "4 2" }}
             content={({ active, payload, label }) => {
               if (!active || !payload?.length) return null;
               const count = payload[0].value as number;
               return (
-                <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-                  <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-                    {label ? new Date(label).toLocaleDateString("es-MX", { month: "long", day: "numeric" }) : ""}
+                <div className="rounded-lg border border-zinc-700 bg-zinc-900 px-3 py-2 shadow-xl">
+                  <p className="text-xs text-zinc-500">
+                    {label
+                      ? new Date(label).toLocaleDateString("es-MX", {
+                          month: "long",
+                          day: "numeric",
+                        })
+                      : ""}
                   </p>
-                  <p className="mt-0.5 text-sm font-bold text-violet-600 dark:text-violet-400">
+                  <p className="mt-0.5 text-sm font-bold text-emerald-400">
                     {count} señal{count !== 1 ? "es" : ""}
                   </p>
                 </div>
@@ -367,10 +381,10 @@ function SignalDayChart({ data }: { data: Array<{ day: string; count: number }> 
             dataKey="count"
             type="natural"
             fill="url(#fillSignals)"
-            stroke="#8b5cf6"
-            strokeWidth={2}
+            stroke="#34d399"
+            strokeWidth={1.5}
             dot={false}
-            activeDot={{ r: 4, fill: "#8b5cf6", strokeWidth: 0 }}
+            activeDot={{ r: 3, fill: "#34d399", strokeWidth: 0 }}
           />
         </AreaChart>
       </ResponsiveContainer>

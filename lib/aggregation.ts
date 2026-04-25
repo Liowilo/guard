@@ -31,19 +31,19 @@ export const RISK_RANK: Record<RiskLevel, number> = {
 
 export const RISK_STYLE: Record<RiskLevel, { bg: string; text: string; border: string }> = {
   bajo: {
-    bg: "bg-emerald-50 dark:bg-emerald-950",
-    text: "text-emerald-800 dark:text-emerald-200",
-    border: "border-emerald-200 dark:border-emerald-900",
+    bg: "bg-emerald-500/10",
+    text: "text-emerald-400",
+    border: "border-emerald-500/30",
   },
   medio: {
-    bg: "bg-amber-50 dark:bg-amber-950",
-    text: "text-amber-800 dark:text-amber-200",
-    border: "border-amber-200 dark:border-amber-900",
+    bg: "bg-amber-500/10",
+    text: "text-amber-400",
+    border: "border-amber-500/30",
   },
   alto: {
-    bg: "bg-red-50 dark:bg-red-950",
-    text: "text-red-800 dark:text-red-200",
-    border: "border-red-200 dark:border-red-900",
+    bg: "bg-red-500/10",
+    text: "text-red-400",
+    border: "border-red-500/30",
   },
 };
 

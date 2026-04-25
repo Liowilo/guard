@@ -29,12 +29,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   if (error || !profile) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-zinc-50 px-6 dark:bg-zinc-950">
-        <div className="max-w-md rounded-lg border border-red-200 bg-red-50 p-6 text-sm text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-          No se encontró tu perfil. Contacta al admin para que te agregue a
-          una familia.
+      <main className="flex min-h-screen items-center justify-center bg-zinc-950 px-6">
+        <div className="max-w-md rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-sm text-red-400">
+          No se encontró tu perfil. Contacta al admin para que te agregue a una familia.
           <form action={logoutAction} className="mt-4">
-            <button className="text-xs underline">Cerrar sesión</button>
+            <button className="text-xs underline text-red-400/70">Cerrar sesión</button>
           </form>
         </div>
       </main>
@@ -43,45 +42,47 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const role = profile.role;
   const navItems: Array<{ href: string; label: string; roles: UserRole[] }> = [
-    { href: "/tutor", label: "Vista tutor", roles: ["tutor"] },
-    { href: "/menor", label: "Vista menor", roles: ["menor"] },
-    { href: "/confianza", label: "Alertas SOS", roles: ["adulto_confianza"] },
-    { href: "/pacto", label: "Pacto", roles: ["tutor", "menor", "adulto_confianza"] },
-    { href: "/demo", label: "Clasificador", roles: ["tutor", "menor", "adulto_confianza"] },
+    { href: "/tutor",     label: "Vista tutor",    roles: ["tutor"] },
+    { href: "/menor",     label: "Vista menor",    roles: ["menor"] },
+    { href: "/confianza", label: "Alertas SOS",    roles: ["adulto_confianza"] },
+    { href: "/pacto",     label: "Pacto",          roles: ["tutor", "menor", "adulto_confianza"] },
+    { href: "/demo",      label: "Clasificador",   roles: ["tutor", "menor", "adulto_confianza"] },
   ];
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <nav className="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">
-        <div className="mx-auto flex max-w-5xl items-center gap-6 px-6 py-3">
+    <div className="min-h-screen bg-zinc-950">
+      <nav className="sticky top-0 z-10 border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur-md">
+        <div className="mx-auto flex max-w-5xl items-center gap-6 px-6 py-3.5">
           <Link
             href={ROLE_HOME[role]}
-            className="text-sm font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
+            className="flex items-center gap-2 shrink-0"
           >
-            Guard
+            <span className="text-sm font-semibold tracking-tight text-zinc-50">Guard</span>
+            <span className="text-zinc-700">·</span>
+            <span className="text-sm font-normal text-zinc-500">Pacto Digital</span>
           </Link>
-          <ul className="flex flex-1 items-center gap-4 text-sm">
+          <ul className="flex flex-1 items-center gap-1 text-sm">
             {navItems
               .filter((item) => item.roles.includes(role))
               .map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                    className="rounded-md px-3 py-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
                   >
                     {item.label}
                   </Link>
                 </li>
               ))}
           </ul>
-          <div className="flex items-center gap-3 text-xs">
-            <span className="hidden text-zinc-500 dark:text-zinc-400 sm:inline">
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="hidden text-xs text-zinc-600 sm:inline">
               {profile.display_name} · {ROLE_LABEL[role]}
             </span>
             <form action={logoutAction}>
               <button
                 type="submit"
-                className="rounded-md border border-zinc-200 px-2.5 py-1 text-zinc-600 hover:border-zinc-300 hover:text-zinc-900 dark:border-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:text-zinc-100"
+                className="rounded-md border border-zinc-800 px-2.5 py-1.5 text-xs text-zinc-400 hover:border-zinc-700 hover:text-zinc-100 transition-colors"
               >
                 Salir
               </button>
