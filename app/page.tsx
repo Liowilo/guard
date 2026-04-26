@@ -1,6 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import GradientText from "@/components/GradientText";
+import HeroLaserFlow from "@/components/HeroLaserFlow";
+import NavBrand from "@/components/NavBrand";
+import PageBlur from "@/components/PageBlur";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -10,29 +14,68 @@ export default async function Home() {
   return (
     <main className="flex min-h-screen flex-col bg-zinc-950 text-zinc-50">
       {/* Nav */}
-      <nav className="fixed top-0 z-50 w-full border-b border-zinc-800/60 bg-zinc-950/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3.5">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold tracking-tight">Guard</span>
-            <span className="text-zinc-700">·</span>
-            <span className="text-sm font-normal text-zinc-500">Pacto Digital</span>
-          </div>
-          <div className="flex items-center gap-1 text-sm">
+      <nav className="fixed top-4 inset-x-0 z-50 flex justify-center px-4">
+        <div
+          className="relative flex w-full max-w-2xl items-center justify-between rounded-full overflow-hidden px-2 py-1.5 backdrop-blur-2xl backdrop-saturate-150 ring-1 ring-white/11"
+          style={{
+            boxShadow:
+              "0 8px 32px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07)",
+          }}
+        >
+          {/* Glass base tint */}
+          <div className="pointer-events-none absolute inset-0 bg-zinc-900/30" />
+          {/* Brand emerald color tint */}
+          <div className="pointer-events-none absolute inset-0 bg-linear-to-br from-emerald-500/8 via-transparent to-teal-400/5" />
+          {/* Top specular line */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/55 to-transparent" />
+          {/* Inner dome highlight */}
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-full"
+            style={{
+              background:
+                "radial-gradient(ellipse 70% 55% at 50% -5%, rgba(255,255,255,0.09) 0%, transparent 100%)",
+            }}
+          />
+          {/* Animated iridescent sweep */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(105deg, transparent 20%, rgba(52,211,153,0.07) 38%, rgba(255,255,255,0.05) 50%, rgba(20,184,166,0.06) 62%, transparent 80%)",
+              backgroundSize: "300% 100%",
+              animation: "navShimmer 8s ease-in-out infinite",
+            }}
+          />
+
+          {/* Logo */}
+          <Link
+            href="/"
+            className="relative z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:bg-white/8 transition-colors"
+          >
+            <NavBrand />
+          </Link>
+
+          {/* Links + CTAs */}
+          <div className="relative z-10 flex items-center gap-0.5">
             <Link
               href="/demo"
-              className="rounded-md px-3 py-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
+              className="rounded-full px-3.5 py-1.5 text-xs font-medium text-zinc-300 hover:bg-white/9 hover:text-zinc-100 transition-all"
             >
               Demo
             </Link>
             <Link
               href="/register"
-              className="rounded-md px-3 py-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100 transition-colors"
+              className="hidden sm:block rounded-full px-3.5 py-1.5 text-xs font-medium text-zinc-300 hover:bg-white/9 hover:text-zinc-100 transition-all"
             >
               Registrarse
             </Link>
             <Link
               href="/login"
-              className="ml-1 rounded-md bg-white px-3 py-1.5 text-xs font-semibold text-zinc-900 hover:bg-zinc-200 transition-colors"
+              className="ml-1 rounded-full bg-white px-4 py-1.5 text-xs font-semibold text-zinc-900 hover:bg-zinc-100 transition-colors"
+              style={{
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.85), 0 2px 8px rgba(0,0,0,0.35)",
+              }}
             >
               Iniciar sesión
             </Link>
@@ -88,7 +131,8 @@ export default async function Home() {
           <div
             className="absolute -top-15 left-1/2 w-175 h-112.5 rounded-full"
             style={{
-              background: "radial-gradient(ellipse, rgba(52,211,153,0.13) 0%, transparent 70%)",
+              background:
+                "radial-gradient(ellipse, rgba(52,211,153,0.13) 0%, transparent 70%)",
               animation: "orbDrift1 15s ease-in-out infinite",
             }}
           />
@@ -96,7 +140,8 @@ export default async function Home() {
           <div
             className="absolute -top-22.5 -right-20 w-120 h-80 rounded-full"
             style={{
-              background: "radial-gradient(ellipse, rgba(20,184,166,0.09) 0%, transparent 70%)",
+              background:
+                "radial-gradient(ellipse, rgba(20,184,166,0.09) 0%, transparent 70%)",
               animation: "orbDrift2 20s ease-in-out infinite",
             }}
           />
@@ -104,34 +149,41 @@ export default async function Home() {
           <div
             className="absolute top-20 -left-15 w-105 h-70 rounded-full"
             style={{
-              background: "radial-gradient(ellipse, rgba(74,222,128,0.07) 0%, transparent 70%)",
+              background:
+                "radial-gradient(ellipse, rgba(74,222,128,0.07) 0%, transparent 70%)",
               animation: "orbDrift3 25s ease-in-out infinite",
             }}
           />
           {/* Partículas flotantes */}
           {[
-            { left: 10, delay: 0,   dur: 9    },
-            { left: 18, delay: 2.1, dur: 11   },
-            { left: 26, delay: 0.8, dur: 8.5  },
-            { left: 34, delay: 3.5, dur: 10   },
-            { left: 42, delay: 1.4, dur: 12   },
-            { left: 50, delay: 4.2, dur: 9.5  },
+            { left: 10, delay: 0, dur: 9 },
+            { left: 18, delay: 2.1, dur: 11 },
+            { left: 26, delay: 0.8, dur: 8.5 },
+            { left: 34, delay: 3.5, dur: 10 },
+            { left: 42, delay: 1.4, dur: 12 },
+            { left: 50, delay: 4.2, dur: 9.5 },
             { left: 58, delay: 0.5, dur: 11.5 },
-            { left: 66, delay: 2.8, dur: 8    },
+            { left: 66, delay: 2.8, dur: 8 },
             { left: 74, delay: 1.9, dur: 10.5 },
-            { left: 82, delay: 3.1, dur: 13   },
-            { left: 90, delay: 0.3, dur: 9    },
-            { left: 22, delay: 5.0, dur: 10   },
+            { left: 82, delay: 3.1, dur: 13 },
+            { left: 90, delay: 0.3, dur: 9 },
+            { left: 22, delay: 5.0, dur: 10 },
           ].map((p, i) => (
             <div
               key={i}
               className="absolute bottom-20 w-0.5 h-0.5 rounded-full bg-emerald-400/50"
-              style={{ left: `${p.left}%`, animation: `particleFloat ${p.dur}s ${p.delay}s ease-in-out infinite` }}
+              style={{
+                left: `${p.left}%`,
+                animation: `particleFloat ${p.dur}s ${p.delay}s ease-in-out infinite`,
+              }}
             />
           ))}
         </div>
 
-        <div className="relative mx-auto max-w-4xl px-6 pt-14 pb-20 sm:pt-16 sm:pb-24 text-center">
+        {/* LaserFlow — blends over existing background via screen */}
+        <HeroLaserFlow />
+
+        <div className="relative mx-auto max-w-4xl px-6 pt-8 pb-20 sm:pt-10 sm:pb-24 text-center">
           {/* Badge */}
           <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/80 px-4 py-1.5 text-xs text-zinc-400">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -140,10 +192,19 @@ export default async function Home() {
 
           {/* App name */}
           <div className="mb-6 leading-none tracking-tighter">
-            <span className="text-6xl font-black text-white sm:text-7xl lg:text-8xl">guard</span><span
-              className="text-6xl font-black sm:text-7xl lg:text-8xl bg-linear-to-br from-emerald-300 via-emerald-400 to-green-500 bg-clip-text text-transparent"
-              style={{ filter: "drop-shadow(0 0 32px rgb(52 211 153 / 0.35))" }}
-            >IA</span>
+            <div className="inline-flex items-baseline">
+              <span className="text-6xl font-bold text-white sm:text-7xl lg:text-8xl">
+                Guard
+              </span>
+              <GradientText
+                colors={["#6EE7B7", "#34D399", "#22C55E"]}
+                animationSpeed={8}
+                showBorder={false}
+                className="text-6xl sm:text-7xl lg:text-8xl font-extrabold! m-0!"
+              >
+                IA
+              </GradientText>
+            </div>
           </div>
 
           {/* Headline */}
@@ -195,7 +256,7 @@ export default async function Home() {
           <FeatureCard
             icon={<IconSos />}
             title="Botón SOS privado"
-            desc='Contacta a un adulto de confianza distinto al tutor. El tutor nunca accede a este canal — porque el riesgo a veces está en casa.'
+            desc="Contacta a un adulto de confianza distinto al tutor. El tutor nunca accede a este canal — porque el riesgo a veces está en casa."
           />
         </div>
       </section>
@@ -236,16 +297,38 @@ export default async function Home() {
         <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-8 sm:p-10">
           <div className="grid gap-8 sm:grid-cols-3">
             <PrivacyStat label="Contenido subido al servidor" value="0 bytes" />
-            <PrivacyStat label="Modelos de 5 patrones de grooming" value="XLM-R" />
-            <PrivacyStat label="Acceso del tutor al canal SOS" value="Ninguno" />
+            <PrivacyStat
+              label="Modelos de 5 patrones de grooming"
+              value="XLM-R"
+            />
+            <PrivacyStat
+              label="Acceso del tutor al canal SOS"
+              value="Ninguno"
+            />
           </div>
         </div>
       </section>
 
+      <PageBlur />
+
       {/* Footer */}
-      <footer className="border-t border-zinc-800/60 py-8">
+      <footer id="page-footer" className="border-t border-zinc-800/60 py-8">
         <div className="mx-auto max-w-5xl px-6 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between text-xs text-zinc-600">
-          <span>Guard · Pacto Digital</span>
+          <span>
+            guard
+            <span
+              style={{
+                backgroundImage:
+                  "linear-gradient(to right, #6EE7B7, #34D399, #22C55E)",
+                backgroundClip: "text",
+                WebkitBackgroundClip: "text",
+                color: "transparent",
+              }}
+            >
+              IA
+            </span>
+            {" · "}Pacto Digital
+          </span>
           <span className="italic">El menor es aliado, no sospechoso.</span>
         </div>
       </footer>
@@ -305,9 +388,28 @@ function PrivacyStat({ label, value }: { label: string; value: string }) {
 function IconOnDevice() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <rect x="2" y="3" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M5 12v1M11 12v1M4 13h8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <path d="M6 7.5l1.5 1.5L10 6" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+      <rect
+        x="2"
+        y="3"
+        width="12"
+        height="9"
+        rx="1.5"
+        stroke="currentColor"
+        strokeWidth="1.2"
+      />
+      <path
+        d="M5 12v1M11 12v1M4 13h8"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M6 7.5l1.5 1.5L10 6"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -316,8 +418,18 @@ function IconTransparency() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
       <circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.2" />
-      <path d="M8 2.5v11M2.5 8h11" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-      <path d="M4.5 4.5c1 1.5 1.5 2.5 3.5 3.5-2 1-2.5 2-3.5 3.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <path
+        d="M8 2.5v11M2.5 8h11"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M4.5 4.5c1 1.5 1.5 2.5 3.5 3.5-2 1-2.5 2-3.5 3.5"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -325,9 +437,19 @@ function IconTransparency() {
 function IconSos() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-      <path d="M8 2L8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path
+        d="M8 2L8 8"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
       <circle cx="8" cy="11" r="1" fill="currentColor" />
-      <path d="M2.5 13.5L5 3.5C5.8 1.2 10.2 1.2 11 3.5l2.5 10" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+      <path
+        d="M2.5 13.5L5 3.5C5.8 1.2 10.2 1.2 11 3.5l2.5 10"
+        stroke="currentColor"
+        strokeWidth="1.2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }

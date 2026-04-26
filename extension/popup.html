@@ -6,132 +6,329 @@
   <title>Guard · Pacto Digital</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       width: 360px;
       min-height: 200px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 13px;
-      background: #fafafa;
-      color: #18181b;
+      background: #09090b;
+      color: #fafafa;
     }
+
+    /* ── Header ─────────────────────────────────────────── */
     .header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 16px;
-      border-bottom: 1px solid #e4e4e7;
-      background: white;
+      padding: 13px 16px;
+      border-bottom: 1px solid #27272a;
+      background: #09090b;
     }
-    .header-title { font-weight: 600; font-size: 14px; color: #18181b; }
-    .header-sub { font-size: 11px; color: #71717a; margin-top: 1px; }
+
+    .logo {
+      display: flex;
+      align-items: baseline;
+    }
+
+    .logo-guard {
+      font-size: 16px;
+      font-weight: 700;
+      color: #fafafa;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-ia {
+      font-size: 16px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #6ee7b7, #34d399, #22c55e);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid #3f3f46;
+      background: #18181b;
+      font-size: 10px;
+      color: #a1a1aa;
+      letter-spacing: 0.01em;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34d399;
+      flex-shrink: 0;
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.35; }
+    }
+
+    /* ── Body ────────────────────────────────────────────── */
     .body { padding: 16px; }
-    label { display: block; font-size: 12px; font-weight: 500; color: #3f3f46; margin-bottom: 4px; }
+
+    /* ── Form ────────────────────────────────────────────── */
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: #a1a1aa;
+      margin-bottom: 5px;
+      letter-spacing: 0.01em;
+    }
+
     input, textarea {
       width: 100%;
-      border: 1px solid #d4d4d8;
-      border-radius: 6px;
-      padding: 8px 10px;
+      border: 1px solid #27272a;
+      border-radius: 8px;
+      padding: 9px 11px;
       font-size: 12px;
       outline: none;
-      background: white;
-      color: #18181b;
+      background: #18181b;
+      color: #fafafa;
+      transition: border-color .15s, box-shadow .15s;
     }
-    input:focus, textarea:focus { border-color: #71717a; box-shadow: 0 0 0 1px #71717a; }
-    textarea { resize: vertical; min-height: 72px; font-family: inherit; }
+
+    input::placeholder, textarea::placeholder { color: #3f3f46; }
+
+    input:focus, textarea:focus {
+      border-color: #34d399;
+      box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.15);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 76px;
+      font-family: inherit;
+      line-height: 1.5;
+    }
+
+    /* ── Buttons ─────────────────────────────────────────── */
     .btn {
       display: block;
       width: 100%;
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 9px 12px;
+      border-radius: 8px;
       border: none;
       cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      transition: opacity .15s;
+      transition: all .15s;
+      text-align: center;
     }
-    .btn:disabled { opacity: .5; cursor: not-allowed; }
-    .btn-primary { background: #18181b; color: white; }
-    .btn-primary:not(:disabled):hover { background: #3f3f46; }
-    .btn-danger { background: #dc2626; color: white; }
-    .btn-danger:not(:disabled):hover { background: #b91c1c; }
+
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    .btn-primary {
+      background: #fafafa;
+      color: #09090b;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85), 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .btn-primary:not(:disabled):hover { background: #e4e4e7; }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid #7f1d1d;
+      color: #f87171;
+    }
+    .btn-danger:not(:disabled):hover { background: rgba(127,29,29,0.2); }
+
     .btn-ghost {
       background: transparent;
-      border: 1px solid #d4d4d8;
-      color: #52525b;
+      border: 1px solid #27272a;
+      color: #71717a;
       font-size: 11px;
       padding: 5px 10px;
       width: auto;
+      border-radius: 6px;
     }
-    .btn-ghost:hover { background: #f4f4f5; }
+    .btn-ghost:hover { background: #18181b; color: #a1a1aa; border-color: #3f3f46; }
+
+    /* ── Layout helpers ──────────────────────────────────── */
     .stack { display: flex; flex-direction: column; gap: 10px; }
-    .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .row   { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+    /* ── User chip ───────────────────────────────────────── */
+    .user-chip { display: flex; align-items: center; gap: 9px; }
+
+    .user-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(16,185,129,0.1));
+      border: 1px solid rgba(52,211,153,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: #34d399;
+    }
+
+    .user-name-text  { font-size: 13px; font-weight: 600; color: #fafafa; }
+    .user-role-text  { font-size: 10px; color: #52525b; margin-top: 1px; }
+
+    /* ── Risk tags ───────────────────────────────────────── */
     .tag {
       display: inline-block;
-      padding: 2px 8px;
+      padding: 2px 9px;
       border-radius: 999px;
-      font-size: 11px;
-      font-weight: 500;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
     }
-    .tag-bajo { background: #d1fae5; color: #065f46; }
-    .tag-medio { background: #fef3c7; color: #92400e; }
-    .tag-alto { background: #fee2e2; color: #991b1b; }
-    .bar-wrap { background: #e4e4e7; border-radius: 4px; height: 5px; overflow: hidden; margin-top: 3px; }
-    .bar { height: 100%; background: #18181b; border-radius: 4px; transition: width .3s; }
-    .bar-alto { background: #dc2626; }
-    .bar-medio { background: #d97706; }
-    .result-item { margin-bottom: 8px; }
-    .result-label { display: flex; justify-content: space-between; font-size: 12px; color: #3f3f46; }
-    .error { background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; padding: 8px 10px; color: #991b1b; font-size: 12px; }
-    .info { background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; padding: 8px 10px; color: #0c4a6e; font-size: 12px; }
-    .success { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 6px; padding: 8px 10px; color: #14532d; font-size: 12px; }
-    .divider { border: none; border-top: 1px solid #e4e4e7; margin: 4px 0; }
-    .text-muted { color: #71717a; font-size: 11px; }
-    .section-title { font-weight: 600; font-size: 12px; color: #18181b; margin-bottom: 8px; }
-    #app { display: none; }
+    .tag-bajo  { background: #052e16; color: #34d399; border: 1px solid #166534; }
+    .tag-medio { background: #431407; color: #fb923c; border: 1px solid #7c2d12; }
+    .tag-alto  { background: #450a0a; color: #f87171; border: 1px solid #7f1d1d; }
+
+    /* ── Progress bars ───────────────────────────────────── */
+    .bar-wrap {
+      background: #27272a;
+      border-radius: 4px;
+      height: 4px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+    .bar {
+      height: 100%;
+      background: #34d399;
+      border-radius: 4px;
+      transition: width .4s ease;
+    }
+    .bar-medio { background: #fb923c; }
+    .bar-alto  { background: #f87171; }
+
+    /* ── Result items ────────────────────────────────────── */
+    .result-item { margin-bottom: 10px; }
+    .result-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #a1a1aa;
+    }
+    .result-label span:last-child {
+      color: #52525b;
+      font-variant-numeric: tabular-nums;
+      font-size: 10px;
+    }
+
+    /* ── Alert banners ───────────────────────────────────── */
+    .error {
+      background: #1c0a0a;
+      border: 1px solid #7f1d1d;
+      border-radius: 8px;
+      padding: 9px 11px;
+      color: #f87171;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+    .info {
+      background: #0c1a2e;
+      border: 1px solid #1e3a5f;
+      border-radius: 8px;
+      padding: 9px 11px;
+      color: #7dd3fc;
+      font-size: 11px;
+    }
+    .success {
+      background: #052e16;
+      border: 1px solid #166534;
+      border-radius: 8px;
+      padding: 9px 11px;
+      color: #34d399;
+      font-size: 11px;
+    }
+
+    /* ── Misc ────────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid #27272a;
+      margin: 2px 0;
+    }
+
+    .text-muted { color: #3f3f46; font-size: 11px; line-height: 1.5; }
+
+    .section-title {
+      font-weight: 600;
+      font-size: 10px;
+      color: #52525b;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 8px;
+    }
+
   </style>
 </head>
 <body>
+
+  <!-- Header -->
   <div class="header">
-    <div>
-      <div class="header-title">Guard</div>
-      <div class="header-sub">Pacto Digital · On-device</div>
+    <div class="logo">
+      <span class="logo-guard">guard</span><span class="logo-ia">IA</span>
     </div>
-    <span id="status-badge" class="tag" style="display:none"></span>
+    <div class="header-badge">
+      <div class="pulse-dot"></div>
+      On-device
+    </div>
   </div>
 
-  <!-- Login -->
+  <!-- ── Login view ─────────────────────────────────────── -->
   <div id="view-login" class="body">
     <div class="stack">
       <div>
-        <label for="email">Correo</label>
-        <input type="email" id="email" placeholder="menor@ejemplo.com" />
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" placeholder="menor@ejemplo.com" autocomplete="email" />
       </div>
       <div>
         <label for="password">Contraseña</label>
-        <input type="password" id="password" />
+        <input type="password" id="password" autocomplete="current-password" />
       </div>
       <div id="login-error" class="error" style="display:none"></div>
       <button class="btn btn-primary" id="btn-login">Iniciar sesión</button>
-      <p class="text-muted" style="text-align:center">Solo menores con pacto firmado pueden enviar señales.</p>
+      <p class="text-muted" style="text-align:center">
+        Solo menores con pacto firmado pueden enviar señales.
+      </p>
     </div>
   </div>
 
-  <!-- Classifier -->
+  <!-- ── App / classifier view ─────────────────────────── -->
   <div id="view-app" class="body" style="display:none">
     <div class="stack">
-      <div id="app-header" class="row">
-        <div>
-          <div class="section-title" id="user-name">—</div>
-          <div class="text-muted">Menor · Pacto activo</div>
+
+      <!-- User row -->
+      <div class="row">
+        <div class="user-chip">
+          <div class="user-icon">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none">
+              <circle cx="8" cy="5.5" r="2.5" stroke="currentColor" stroke-width="1.3"/>
+              <path d="M2.5 13.5c0-2.76 2.46-5 5.5-5s5.5 2.24 5.5 5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div>
+            <div class="user-name-text" id="user-name">—</div>
+            <div class="user-role-text">Menor · Pacto activo</div>
+          </div>
         </div>
         <button class="btn btn-ghost" id="btn-logout">Salir</button>
       </div>
+
       <hr class="divider" />
 
+      <!-- Model loading -->
       <div id="model-loading" class="info" style="display:none">
         Cargando modelo… <span id="model-progress"></span>
       </div>
 
+      <!-- Message textarea -->
       <div>
         <label for="message">Mensaje a analizar</label>
         <textarea id="message" placeholder="Pega aquí el mensaje que quieres analizar…"></textarea>
@@ -139,15 +336,16 @@
 
       <button class="btn btn-primary" id="btn-analyze">Analizar (on-device)</button>
 
+      <!-- Results -->
       <div id="results" style="display:none">
         <hr class="divider" />
-        <div class="section-title row">
-          Resultados
+        <div class="row" style="margin-bottom:10px">
+          <span class="section-title" style="margin-bottom:0">Resultados</span>
           <span id="risk-tag" class="tag"></span>
         </div>
         <div id="result-bars"></div>
         <div id="signal-sent" class="success" style="display:none">
-          Señal enviada al dashboard.
+          ✓ Señal enviada al dashboard.
         </div>
         <button class="btn btn-danger" id="btn-send" style="display:none">
           Enviar señal al dashboard
@@ -155,6 +353,7 @@
       </div>
 
       <div id="app-error" class="error" style="display:none"></div>
+
     </div>
   </div>
 

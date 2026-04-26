@@ -74,4 +74,26 @@
   chrome.runtime.onStartup.addListener(() => {
     ensureOffscreen().catch((err) => console.error("[Guard SW] ensureOffscreen", err));
   });
+  var guardWindowId = null;
+  chrome.action.onClicked.addListener(async () => {
+    if (guardWindowId !== null) {
+      try {
+        await chrome.windows.update(guardWindowId, { focused: true });
+        return;
+      } catch {
+        guardWindowId = null;
+      }
+    }
+    const win = await chrome.windows.create({
+      url: chrome.runtime.getURL("popup.html"),
+      type: "popup",
+      width: 400,
+      height: 580,
+      focused: true
+    });
+    guardWindowId = win.id ?? null;
+  });
+  chrome.windows.onRemoved.addListener((windowId) => {
+    if (windowId === guardWindowId) guardWindowId = null;
+  });
 })();
