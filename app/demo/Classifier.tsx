@@ -33,11 +33,10 @@ export default function Classifier({ samples }: { samples: string[] }) {
     (async () => {
       try {
         const { pipeline, env } = await import("@huggingface/transformers");
-        env.allowRemoteModels = false;
-        env.allowLocalModels = true;
-        env.localModelPath = "/models/";
+        env.allowRemoteModels = true;
+        env.allowLocalModels = false;
 
-        const clf = await pipeline("text-classification", "guardia", {
+        const clf = await pipeline("text-classification", "Liowilo/guardia", {
           dtype: "q8",
           progress_callback: (p: { status: string; progress?: number; file?: string }) => {
             if (cancelled) return;
